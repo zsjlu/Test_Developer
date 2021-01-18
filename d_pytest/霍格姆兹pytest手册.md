@@ -448,5 +448,12 @@ allure重点页面介绍：
         
         with allure.step("关闭浏览器"):
             driver.quit()
+            
+
+执行：
+
+    pytest test_baidudemo.py -s -q --alluredir=./result/
+    
+    allure serve ./result/
                
 
