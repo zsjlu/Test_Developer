@@ -22,7 +22,7 @@ appium实现自动化功能测试，使用pytest结合allure集成到Jenkins中�
     
  
  
-##用例的识别与运行
+## 用例的识别与运行
 
 - 测试文件以test_开头（以_test结尾也可以)
 - 测试类以Test开头，并且不能带有init方法
@@ -33,7 +33,7 @@ appium实现自动化功能测试，使用pytest结合allure集成到Jenkins中�
 执行结果中F代表用例未通过（断言错误）， "."代表用例通过。如果有报错会有详细
 的错误信息。pytest也支持unittest模式的用例定义。
 
-####运行参数
+## 运行参数
 
 pytest带有很多参数，可以使用pytest --help来查看帮助文档，
 
@@ -156,7 +156,7 @@ pytest加载所有的用例是乱序的，使用pytest.mark.run(order=[num])来�
             print("test_one, 测试用例）
             
             
-##pytest fixtures
+## pytest fixtures
 
 pytest中可以使用@pytest.fixture装饰器来修饰一个方法，被装饰方法的方法名可以作为一个
 参数传入到测试方法中。可以使用这种方式来完成测试之前的初始化，也可以返回数据给测试函数。
@@ -227,7 +227,7 @@ scope="module"与yield结合，相当于setup_module和teardown_module方法。�
          
          
          
-##conftest.py文件
+## conftest.py文件
 
 fixture scope为session级别是可以跨.py模块调用的，也就是当我们有多个.py文件的用例时，
 如果多个用例只需调用一次fixture，可以将scope="session",并且写到conftest.py文件里。
@@ -251,7 +251,7 @@ fixture scope为session级别是可以跨.py模块调用的，也就是当我们
             print("执行teardown")
             print("最后关闭浏览器")             
 
-##自动执行fixture
+## 自动执行fixture
 
 如果每条测试用例都需要添加fixture功能，则需要在每一个用例方法里面传入这个fixture的
 名字，这里就可以在装饰器里面添加一个参数autouse="true",它会自动应用到所有的方法中，
@@ -263,7 +263,7 @@ fixture scope为session级别是可以跨.py模块调用的，也就是当我们
         
 这样每个测试函数都会自动调用这个前置函数。
 
-##fixture传递参数
+## fixture传递参数
 
 测试过程中需要大量的测试数据，如果每条测试数据都编写一条测试用例，用例数量将是非常庞大的。
 一般我们在测试过程中会将测试用到的数据以参数的形式传入到测试用例中，并为每条测试数据生成
@@ -300,7 +300,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
     
     
     
-##结合pytest-html生成测试报告
+## 结合pytest-html生成测试报告
 
 安装
 
@@ -318,7 +318,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
     
     
     
-##参数化用例
+## 参数化用例
 把不同的参数，写到一个集合里，然后程序会自动取值运行用例，直到集合为空便结束。
 @pytest.mark.parametrize来参数化。
 
@@ -376,7 +376,7 @@ def parametrize(self,argnames,argvalues,indirect=False,ids=None,scope=None)
         asset a != ""
  
  
-##数据驱动（yaml）
+## 数据驱动（yaml）
 
 pytest结合YAML
 
@@ -394,7 +394,7 @@ yaml是一个可读性搞，用来表达数据序列化的格式。pyyaml模块�
     def test_answer2(a, b):
         assert func(a) == b
 
-##结合allure生成测试报告
+## 结合allure生成测试报告
 
 安装
 
@@ -430,7 +430,7 @@ allure重点页面介绍：
 - 测试用例详情页面。       
     
     
-##前端自动化测试-百度搜索功能实战
+## 前端自动化测试-百度搜索功能实战
 
     import allure
     import pytest
