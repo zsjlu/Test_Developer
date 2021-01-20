@@ -97,17 +97,17 @@ pytest带有很多参数，可以使用pytest --help来查看帮助文档，
     pytest 文件名.py::类名             
     pytest 文件名.py::类名::方法名
 
-    封装代码后通过pytest运行时报错模块没找到错误。
-
-    导入模块前面加上这2句话解决 No modlue name '模块名'的报错。
-
-    import os,sys                                     
-
-    sys.path.append(os.getcwd())            #告诉pytest运行前先检索当前路径
-
-    报错原因pytest运行时没有检索当前目录自己导入的模块
-
-    在pycharm中运行pytest用例
+        封装代码后通过pytest运行时报错模块没找到错误。
+    
+        导入模块前面加上这2句话解决 No modlue name '模块名'的报错。
+    
+        import os,sys                                     
+    
+        sys.path.append(os.getcwd())            #告诉pytest运行前先检索当前路径
+    
+        报错原因pytest运行时没有检索当前目录自己导入的模块
+    
+        在pycharm中运行pytest用例
 
 
     设置-》Tools-》Python Integrated Tools-》Testing:pytest
