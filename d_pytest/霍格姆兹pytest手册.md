@@ -21,9 +21,7 @@ appium实现自动化功能测试，使用pytest结合allure集成到Jenkins中�
     pytest --version
     
  
-###用例的识别与运行
-
-####用例的识别与运行
+##用例的识别与运行
 
 - 测试文件以test_开头（以_test结尾也可以)
 - 测试类以Test开头，并且不能带有init方法
@@ -104,7 +102,7 @@ pytest带有很多参数，可以使用pytest --help来查看帮助文档，
   
   
   
-#### pytest框架结构
+## pytest框架结构
 
 与unittest类似，执行用例前后会执行setup，teardown来增加用例的前置和后置条件。
 pytest框架中使用setup，teardown更灵活，按照用例运行级别可以分为以下几类：
@@ -121,7 +119,7 @@ pytest框架中使用setup，teardown更灵活，按照用例运行级别可以�
     teardown_class>teardown_module
     
 
-#### 控制用例的执行顺序
+## 控制用例的执行顺序
 
 pytest加载所有的用例是乱序的，使用pytest.mark.run(order=[num])来设置执行顺序，
 这里需要安装一个插件
@@ -144,7 +142,7 @@ pytest加载所有的用例是乱序的，使用pytest.mark.run(order=[num])来�
         def test_one(self):
             print("test_one, 测试用例）
             
-####pytest fixtures
+##pytest fixtures
 
 pytest中可以使用@pytest.fixture装饰器来修饰一个方法，被装饰方法的方法名可以作为一个
 参数传入到测试方法中。可以使用这种方式来完成测试之前的初始化，也可以返回数据给测试函数。
@@ -214,7 +212,7 @@ scope="module"与yield结合，相当于setup_module和teardown_module方法。�
 
          
          
-####conftest.py文件
+##conftest.py文件
 
 fixture scope为session级别是可以跨.py模块调用的，也就是当我们有多个.py文件的用例时，
 如果多个用例只需调用一次fixture，可以将scope="session",并且写到conftest.py文件里。
@@ -238,7 +236,7 @@ fixture scope为session级别是可以跨.py模块调用的，也就是当我们
             print("执行teardown")
             print("最后关闭浏览器")             
 
-####自动执行fixture
+##自动执行fixture
 
 如果每条测试用例都需要添加fixture功能，则需要在每一个用例方法里面传入这个fixture的
 名字，这里就可以在装饰器里面添加一个参数autouse="true",它会自动应用到所有的方法中，
@@ -250,7 +248,7 @@ fixture scope为session级别是可以跨.py模块调用的，也就是当我们
         
 这样每个测试函数都会自动调用这个前置函数。
 
-####fixture传递参数
+##fixture传递参数
 
 测试过程中需要大量的测试数据，如果每条测试数据都编写一条测试用例，用例数量将是非常庞大的。
 一般我们在测试过程中会将测试用到的数据以参数的形式传入到测试用例中，并为每条测试数据生成
@@ -269,7 +267,7 @@ fixture scope为session级别是可以跨.py模块调用的，也就是当我们
         assert data < 5
            
 
-#### 多线程并行与分布式执行
+## 多线程并行与分布式执行
 
 pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，这款插件允许用户将测试并发
 执行（进程级并发），插件是动态决定测试用例执行顺序的，为了保证各个测试能在各个独立线程里
@@ -286,7 +284,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
     pytest -n [num]
     
     
-####结合pytest-html生成测试报告
+##结合pytest-html生成测试报告
 
 安装
 
@@ -303,7 +301,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
 
     
     
-####参数化用例
+##参数化用例
 把不同的参数，写到一个集合里，然后程序会自动取值运行用例，直到集合为空便结束。
 @pytest.mark.parametrize来参数化。
 
@@ -331,7 +329,7 @@ def parametrize(self,argnames,argvalues,indirect=False,ids=None,scope=None)
         assert func(a) == b
         
         
-####  多次组合使用parametrize
+##  多次组合使用parametrize
 
 同一个测试用例还可以同事添加多个@pytest.mark.parametrize装饰器，多个parametrize的
 所有元素互相组合（类似笛卡尔积),生成大量测试用例
@@ -341,7 +339,7 @@ def parametrize(self,argnames,argvalues,indirect=False,ids=None,scope=None)
     def test_foo(x,y):
         print(f"测试数据组合x:{x}, y:{y}")
 
-#### @pytest.fixture与@pytest.mark.parametrize结合实现参数化
+## @pytest.fixture与@pytest.mark.parametrize结合实现参数化
 
 如果测试数据需要在fixture方法中使用，同时也需要在测试用例中使用，可以在使用parametrize
 的时候添加一个参数indirect=True，pytest可以实现将参数传入到fixture方法中，也可以在当
@@ -361,7 +359,7 @@ def parametrize(self,argnames,argvalues,indirect=False,ids=None,scope=None)
         asset a != ""
  
  
-####数据驱动（yaml）
+##数据驱动（yaml）
 
 pytest结合YAML
 
@@ -379,7 +377,7 @@ yaml是一个可读性搞，用来表达数据序列化的格式。pyyaml模块�
     def test_answer2(a, b):
         assert func(a) == b
 
-####结合allure生成测试报告
+##结合allure生成测试报告
 
 安装
 
@@ -415,7 +413,7 @@ allure重点页面介绍：
 - 测试用例详情页面。       
     
     
-####前端自动化测试-百度搜索功能实战
+##前端自动化测试-百度搜索功能实战
 
     import allure
     import pytest
