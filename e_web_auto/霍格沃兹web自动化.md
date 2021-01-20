@@ -112,9 +112,187 @@ WebDriverWait配合该类的until()和until_not()方法，就能够根据
 强制等待，线程休眠一定时间。强制等待一般在隐式等待和显示等待都不起作用时使用。
 
     time.sleep(10)
+
+#### 案例
+
+    import time
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions
+    from selenium.webdriver.support import WebDriverWait
+    
+    class TestHogwarts():
+        def setup(self):
+            self.driver = webdriver.Chrome()
+            self.driver.get('https://home.testing-studio.com/')
+            self.driver.implicitly_wait(5)
+            
+        def teardown():
+            time.sleep(3)
+            self.driver.quit()
+            
+        def test_hogwarts(self):
+            # 元素定位，category_name是一个元组
+            category = (By.CSS_SELECTOR, "#ember195 .category-name")
+            self.driver.find_element_by_link_text('分类').click()
+            WebDriverWait(self.driver, 10).until(
+                expected_conditions.element_to_be_clickable(category_name)
+            )
+            
+            self.driver.find_element("category_name).click()
+            
+            
+## web控件定位与常见操作               
+
+id
+    
+    元素的id属性
+    
+xpath
+
+    find_element_by_xpath("//form[@id='form']\
+    /span[@class=bg s_btn_wr']/input")
+    
+    nodename 选取此节点的所有子节点
+    
+    /        从根节点选取
+    
+    //       从匹配选择的当前节点选择文档中的节点，而不考虑它们的位置。
+    
+    .        选取当前节点
+    
+    ..       选取当前节点的父节点
+    
+    @        选取属性  
     
 
+css_selector
 
+    find_element_by_css_selector('.active>a')
+    
+    .intro              class="intro"的所有元素
+    
+    #firstname          id="firstname"的所有元素
+    
+    a[target=_blank]    具有属性target="_blank"的所有a元素
+    
+    p:nth-child(2)      属于其父元素的第二个p元素
+    
+link
+    
+    find_element_by_link_text('...')
+    
+    find_element_by_partial_link_text('...')
+    
+tag_name
 
+    find_element_by_tag_name()
+    避免使用
+  
+class_name
 
-   
+    find_element_by_class_name('active')
+    
+#### 推荐使用
+
+    ID > CSS > Xpath > Link > class_name > tagname
+    
+#### 常见操作
+
+- 输入、点击、清除    
+    
+    - send_keys()
+    - click()
+    - clear()
+    
+    
+- 关闭窗口、浏览器
+
+    - close() #关闭窗口
+    - quit() #关闭浏览器
+        
+- 获取元素属性
+    
+    - 元素.get_attribute('属性')
+    - 元素.location #获取元素位置坐标 => {'x': 844, 'y': 181 }
+    - 元素.size # 获取元素大小 => { 'height': 36, 'width': 100 }
+    
+- 获取网页源代码、刷新页面
+    
+    - driver.page_source # 获取页面源代码
+    - driver.refresh() # 页面刷新
+    
+- 设置窗口    
+
+    - driver.minimize_window()
+    - driver.maximize_window()
+    - driver.set_window_size(1000, 1000)
+
+## web控件的交互进阶
+
+简介
+
+selenium中与浏览器交互就需要导入Action Chains，当需要模拟键盘or
+鼠标操作时，需要使用ActionChains来处理。
+
+Action Chains类常用于模拟鼠标的行为，比如单击，双击，拖动等行为。
+当你调用ActionChains的方法时，会将所有操作按顺序存入队列，当调用
+perform()方法时，队列中的事件会依次执行。
+
+引入依赖
+
+    from selenium.webdriver import ActionChains
+    from selenium import webdriver
+    
+    driver = webdriver.Chrome()
+    action = ActionChains(driver)
+    action.send_keys()
+    
+点击相关操作
+
+    action.click(on_element=None) #鼠标单击指定元素，不指定会单击鼠标当前位置
+    
+    action.click_and_hold(on_element=None)
+    
+    action.context_click(on_element=None) # 右键点击
+    
+    action.double_click(on_element=None)
+    
+    # 拖拽
+    action.drag_and_drop(source, target)
+    
+    action.drag_and_drop_by_offset(source, xoffset, yoffset)
+    
+按键
+    
+    action.key_down(value, element=None)
+    
+    # 实现ctrl+c操作
+    
+    ActionChains(driver).key_down(Keys.CONTROL)\
+    .send_keys('c').key_up(Keys.CONTROL).perform()
+    
+鼠标移动
+
+    action.move_by_offset(xoffset, yoffset)
+    
+    action.move_to_element(to_element)
+    
+    action.move_to_element_with_offset(to_element, xoffset, yoffset)
+    
+其他
+
+    action.release(on_element=None)
+    
+    action.send_keys(*keys_to_send) #向焦点元素输入值
+    
+    action.send_keys_to_element(element, *keys_to_send)
+
+将之前的一系列ActionChains执行
+    
+    action.perform()
+    
+    
+            
+            
+## 网页frame与多窗口处理            
