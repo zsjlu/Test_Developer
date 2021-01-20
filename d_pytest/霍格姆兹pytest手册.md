@@ -21,6 +21,7 @@ appium实现自动化功能测试，使用pytest结合allure集成到Jenkins中�
     pytest --version
     
  
+ 
 ##用例的识别与运行
 
 - 测试文件以test_开头（以_test结尾也可以)
@@ -113,6 +114,7 @@ pytest带有很多参数，可以使用pytest --help来查看帮助文档，
   
   
   
+  
 ## pytest框架结构
 
 与unittest类似，执行用例前后会执行setup，teardown来增加用例的前置和后置条件。
@@ -152,6 +154,7 @@ pytest加载所有的用例是乱序的，使用pytest.mark.run(order=[num])来�
         @pytest.mark.run(order=3)
         def test_one(self):
             print("test_one, 测试用例）
+            
             
 ##pytest fixtures
 
@@ -221,6 +224,7 @@ scope="module"与yield结合，相当于setup_module和teardown_module方法。�
 来进行方法的传入。
 
 
+         
          
          
 ##conftest.py文件
@@ -295,6 +299,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
     pytest -n [num]
     
     
+    
 ##结合pytest-html生成测试报告
 
 安装
@@ -310,6 +315,7 @@ pytest-xdist是pytest分布式执行插件，可以多个CPU或主机执行，�
     pytest -v -s -n 3 --html=report.html --self-contained-html
     
 
+    
     
     
 ##参数化用例
