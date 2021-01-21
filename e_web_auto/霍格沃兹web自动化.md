@@ -295,4 +295,150 @@ perform()方法时，队列中的事件会依次执行。
     
             
             
-## 网页frame与多窗口处理            
+## 网页frame与多窗口处理           
+
+简介
+
+当我们要定位一个元素时，怎么都定位不到的时候就要考虑是不是浏览器内嵌
+了一个frame窗口或者要找到的元素在新打开的窗口里。这时候就需要进行
+frame的切换以及窗口的切换。
+
+frame类似于在原有主html的基础上又嵌套一个html，而且嵌套的html是
+独立使用，互补影响。
+
+当打开一个页面时，光标的定位是在主页面中，如果页面是由多个frame组成的，
+那么无法直接定位到具体的元素，需要切换到自己所需要的frame中，再查找
+该元素。
+
+### iframe的多种切换方式
+
+假设一个html代码
+    
+    <iframe src="1.html" id="hogwarts_id" name="hogwarts_name"></iframe>
+
+那么通过传入id、name、index以及selenium的WebElement对象来切换frame
+
+- index: 传入整型的参数，从0开始
+    
+    - driver.switch_to.frame(0)
+    
+- id: 传入字符串的参数
+
+    - driver.switch_to.frame("hogwarts_id") 
+
+-  name: 传入字符串的参数
+
+    - driver.switch_to.frame("hogwarts_name")
+
+-  WebElement:传入selenium.webelement对象
+    - driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
+    
+
+### iframe切换回默认页面
+
+    在driver.switch_to.frame()之后，如果还想操作原页面，则可以使用
+    
+- driver.switch_to.default_content()
+
+### iframe多层切换
+
+    driver.switch_to.frame("iframe1")
+    
+    driver.switch_to.frame("iframe2")
+    
+    driver.switch_to.parent_frame()
+    
+    driver.switch_to.parent_frame()
+    
+### 多窗口处理
+
+元素有属性，浏览器的窗口其实也有属性的，只是看不到，浏览器窗口的属性
+用句柄（handle）来识别。
+
+当浏览器打开一个窗口时，如果要在新的窗口操作就需要句柄切换。人为操作
+的话，可以通过眼睛看，识别不同的窗口点击切换。但是脚本没长眼睛，它不
+知道你操作哪个窗口，这时候只能句柄来判断了。
+
+## 句柄的获取
+
+当有个多个窗口时，可用window_handles打印一下句柄：
+
+    browser = webdriver.Chrome()
+    handles = browser.window_handles
+    print(handles)
+
+    current_handle = driver.current_window_handle()
+    all_handle = driver.window_handles()
+    for i in all_handle:
+        if i != current_handle:
+            driver.switch_to.window(i)
+            
+## 多浏览器处理
+
+通过对代码的改造，实现自动化脚本对多浏览器的支持。
+
+通过传递不通的参数测试不同的浏览器，用来实现浏览器的兼容性测试。
+
+注意：需要先将各个浏览器的驱动配置好
+
+    import os
+    from selenium import webdriver
+    
+    def test_browser():
+        browser = os.getenv("browser").lower()
+        if browser == "headless":
+            driver = webdriver.PhantomJS()
+        elif browser == "firefox"
+            driver = webdriver.Firefox()
+        else:
+            driver = webdriver.Chrome()
+        driver.get("https://home.testing-studio.com/")
+        
+    mac设置环境变量
+        
+        browser=firefox pytest test_hogwarts.py
+        
+    windows下比较特殊，要使用windows下的set来给变量赋值
+    
+        set browser=firefox
+        
+        pytest test_hogwarts.py
+        
+## 执行JavaScript脚本
+
+webdriver提供了execute_script()接口来调用js代码。
+
+执行js有两种常见：
+
+- 一种是在页面上直接执行js
+- 另一种是在某个已经定位的元素上执行js
+
+简介
+
+javaScript是一种脚本语言，有的场景需要使用js脚本注入辅助我们完成
+selenium无法做到的事情。 
+
+执行js
+
+selenium 可以通过execute_script()来执行JavaScript脚本。
+
+    - driver.execute_script:同步执行JS在当前的窗口/框架下                   
+    - js脚本可以在浏览器的开发者工具->Console中进行调试
+    
+js的返回结果
+
+    js = "return JSON.string(performanc.timing);"
+    driver.execute_script(js)
+    # 获取网页性能的响应时间，js脚本中使用return代表返回获取的结果
+    
+arguments传参
+
+执行JavaScript也可以通过传参的方式去传入元素信息
+  
+element = driver.find_element(by, locator)
+# argument[0]代表所传值element的第一个参数
+driver.execute_script("argument[0].click();", element) 
+
+## 文件上传于弹框处理       
+                       
+                                           

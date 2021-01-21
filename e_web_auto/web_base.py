@@ -9,3 +9,11 @@ from selenium.webdriver.support import expected_conditions
 
 driver = webdriver.Chrome()
 WebDriverWait(driver, 10).until(expected_conditions.element_to_be_clickable(By.TAG_NAME, "title"))
+
+current_handle = driver.current_window_handle()
+all_handle = driver.window_handles()
+for i in all_handle:
+    if i != current_handle:
+        driver.switch_to.window(i)
+
+driver = webdriver.PhantomJS()
