@@ -439,6 +439,210 @@ element = driver.find_element(by, locator)
 # argument[0]代表所传值element的第一个参数
 driver.execute_script("argument[0].click();", element) 
 
-## 文件上传于弹框处理       
+## 文件上传于弹框处理   
+
+简介
+
+在有些场景中，是需要上传文件，而selenium是无法定位到弹出的文件框以及
+网页弹出的提醒。这些都是需要特殊的方式来处理。
+
+定义一个方法，通过execute_script执行js，js脚本中arguments[0]代表
+所传值element的第一个参数，click()代表js中的点击动作，element
+是传入selenium.webelement对象，也就是定位到的元素
+
+    def click_by_js():
+        element = driver.find_element(By.CSS_SELECTOR,"#js_upload_input")
+        driver.execute_script("arguments[0].click();", elemet)
+        
+文件上传
+
+简单的input标签上传方式要使用自动化上传不难，先定位到上传按钮，然后
+send_keys把路径作为值给传进去。
+
+    driver.find_element(By.CSS_SELECTOR， "#js_upload_input").send_keys("./hogwarts.png")
+
+其他常用的js脚本
+
+    # 除掉元素只读属性
+    driver.execute_script("arguments[0].removeAttribute('readonly')", element)
+    # 元素滚动到指定位置
+    driver.execute_script(("arguments[0].scrollIntoView(true);" element))
+    # 将元素属性由"none"改为"block"
+    driver.execute_script(('document.querySelector("#js_upload_input").style.display="block";'))
+
+弹窗处理 
+
+在页面操作中有时会遇到JavaScript所生成的alert、confirm以及prompt弹框，
+可以使用switch_to.alert()方法定位到。然后使用text/accept/dismiss/
+send_keys等方法进行操作
+
+- switch_to.alert(): 获取当前页面上的警告框。
+- text： 返回alert/confirm/prompt中的文字信息。
+- accept(): 接受现有警告框，即点击确认。
+- dismiss(): 解散现有警告框，即点击取消
+- send_key(keysToSend): 发送文本至警告框。keysToSend：将文本发送
+至警告框
+
+alert弹框
+
+    alert = driver.switch_to.alert
+    
+    print(alert.text)
+    
+    alert.accept()
+    
+    alert.dismiss()
+
+prompt 弹框
+
+    alert = driver.switch_to.alert
+    
+    print(alert.text)
+    
+    alert.send_keys('selenium Alert弹出窗口输入信息')
+    
+    alert.accept()
+    
+        
+        
+confirm 弹框
+    
+    alert = driver.switch_to.alert
+    
+    print(alert.text)
+    
+    alert.accept()
+    
+    alert.dismiss()
+    
+## PageObject设计
+
+简介
+
+为UI页面写测试用例时（比如web页面，移动端页面），测试用例会存在大量
+元素和操作细节。当UI变化时，测试用例也要跟着变化，PageObject很好
+的解决了这个问题！
+
+使用UI自动化测试工具时（包括selenium，appium等），如果无统一模式进行
+规范，随着用例的增多会变得难以维护，而PageObject让自动化脚本井井有序，
+将page单独维护并封装细节，可以使testcase更稳健，不需要大改大动。
+
+使用
+
+具体做法：把元素信息和操作细节封装到Page类中，在测试用例上调用Page
+对象（PageObject），比如存在一个功能“选取相册标题”，需要为之建立函数
+selectAblumWithTitle()，函数内部是操作细节findElementsWithClass('album')等；
+
+pageobject的主要原则是提供一个简单接口，让调用者在页面上可以做任何操作，
+点击页面元素，在输入框输入内容等。
+
+不用为每个UI页面都建立一个page类，只为页面中重要的元素建立page类
+
+pageobject的目的是通过给页面建模，从而对应用程序的使用者变得有意义：
+
+如果你想导航到另一个页面，初始page对象应当return另一个page对象，比如
+点击注册，进入注册页面，在代码中应该return Register()。如果想获取页面
+信息，可以return基本类型（字符串、日期）。
+
+
+建议不要在page object中放断言。应该去测page object，而不是让pageobject
+自己测自己，pageobject的责任是提供页面的状态信息。这里仅用HTML描述
+Page Object，这种模式哈可以用来隐藏Java swing UI细节，它可用于
+所有UI框架。
+
+## PO原则
+
+简介
+
+PageObject的核心思想是六大原则，掌握六大原则才可以进行PageObject
+实战演练，这是PageObject的精髓所在。
+
+selenium官方提出六大原则：
+
+1.公共方法代表页面提供的服务
+2.不要暴露页面细节
+3.不要把断言和操作细节混用
+4.方法可以return到新打开的页面
+5.不要把整页内容都放到PO中
+6.相同的行为会产生不同结果，可以封装不同结果
+
+    test_selenium
+        page
+            __init__.py
+            components
+            base_page.py
+            index.py
+            login.py
+            register.py
+        testcase
+            __init__.py
+            test_index.py
+
+BasePage是所有page object的父类，它为子类提供公共的方法，比如下面
+的BasePage提供初始化driver和退出driver，代码中在base_page模块的
+BasePage类中使用__init__初始方法进行初始化操作，包括driver的复用，
+driver的赋值，全局等待的设置（隐式等待）等等：
+
+    from time import sleep
+    from selenium import webdriver
+    from selenium.webdriver.remote.webdriver import WebDriver
+    
+    class BasePage:
+        def __init__(self, driver:WebDriver = None):
+            if driver is None:
+                self._driver = webdriver.Chrome()
+                self._driver.implicitly_wait(3）
+                self._driver.get(self._base_url)
+            else:
+                self._driver = driver
+        
+        def close(self):
+            sleep(20)
+            self._driver.quit()
+            
+
+Index是企业微信首页的page object，它存在两个方法，进入注册page object
+和进入登录page object，这里return方法返回page object实现了页面跳转，
+比如：goto_register方法return Register，实现从首页跳转到注册页：
+
+    from selenium.webdriver.common.by import By
+    from test_selenium.page.base_page import Basepage
+    from test_selenium.page.login import Login
+    from test_selenium.page.register import Register
+    
+    class Index(BasePage):
+    
+        _base_url = "https://work.weixin.qq.com/"
+        
+        def goto_register(self):
+            self._driver.find_element(By.LINK_TEXT, "立即注册").click()
+            return Register(self._driver)
+            
+        def goto_login(self):
+            self._driver.find_element(By.LINK_TEXT,"企业登录").click()
+            return Login(self._driver)
+            
+            
+            ...
+            
+        test_index模块是对上述功能的测试，它独立于page类
+        
+        from test_selenium.page.index import Index
+        
+        class TestIndex:
+            def setup(self):
+                self.index = Index()
+            
+            def test_register(self):
+                self.index.goto_register().register("..")
+            
+            ...
+            
+            def teardown(self):
+                self.index.close()
+        
+            
+                                                                    
+                   
                        
                                            
