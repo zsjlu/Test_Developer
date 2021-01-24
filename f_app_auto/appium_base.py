@@ -5,7 +5,7 @@
 from appium import webdriver
 from selenium.webdriver.support import  expected_conditions
 from hamcrest import *
-
+from appium.webdriver.webdriver import WebDriver
 
 caps={}
 
