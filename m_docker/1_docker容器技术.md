@@ -625,6 +625,146 @@ Docker search时，实际上是通过Docker daemon与docker registry通信。
 
 ## Dockerfile语法与指令
 
+在日常的工作中，常常需要制作自己的项目的镜像，一般通过以下两种方式制作镜像：
+Docker commit、Dockerfile。
+
+### Docker commit
+
+Docker commit一般做从一个运动状态的容器来创建一个新的镜像。定制镜像应该
+使用Dockerfile来完成。
+
+    docker commit 容器名 新镜像名:tag
+    
+使用这种方式的缺点是：
+
+1.对外不可解释，不方便于排查问题。
+
+2.可维护性差、可阅读性差
+
+### Dockerfile
+
+Dockerfile是由一系列指令和参数构成的脚本，一个Dockerfile里面包含了构建
+整个镜像的完整命令。Docker通过docker build执行Dockerfile中的一系列指令
+自动构建镜像。以下是Dockerfile中一些常用字段的含义:
+
+>FROM:基础镜像，FROM命令必须是Dockerfile的首个命令。
+>
+>LABEL：为镜像生成元数据标签信息。原有指令MAINTAINER已经放弃使用，用
+>LABEL maintainer=“hogwarts@testing-studio.com”替代。
+>
+>USER：指定运行容器时的用户名或UID，后续RUN也会使用指定用户。
+>
+>RUN：RUN命令时Dockerfile执行命令的核心部分。它接受命令作为参数并用于
+>创建镜像。每条RUN命令在当前基础镜像上执行，并且会提交一个新镜像。
+>
+>VOLUME：定义匿名卷，容器运行时应该尽量保持容器存储层不发生写操作，为了
+>防止运行时用户忘记将动态文件保持的目录挂载为卷，可以事先指定某些目录挂载
+>为匿名卷。这样就不会向容器存储层写入大量数据。
+>
+>WORKDIR：WORKDIR命令用于设置CMD指令的命令的运行目录。为后续的RUN、CMD
+>、ENTRYPOINT、ADD指令配置工作目录。可以使用多个WORKDIR指令，后续命令
+>如果参数是相对路径，则会基于之前命令指定的路径。使用docker exec -it进入
+>容器后，默认也会进入到WORKDIR指定的目录。
+>
+>ENV：指定容器启动时的环境变量（注意，只有在容器启动时，启动脚本能读取到，
+>如果希望其他用户登录到容器也生效的话，需要写入.bashrc).
+>
+>COPY:COPY命令有两个参数，源和目标。它的基本作用是从源系统的文件系统上
+>复制文件到目标容器的文件系统。
+>
+>EXPOSE：指定端口转发
+>
+>CMD：设置容器创建是执行的默认命令。支持三种格式，默认会被docker run指定
+>的参数覆盖。每个容器只能执行一条CMD命令。执行的命令和参数当指定多个时，只有
+>最后一个起效。
+>
+>- CMD["executable","args1","args2"]: 使用exec方式执行，推荐。     
+>- CMD command 参数1 参数2: shell方式执行      
+>- CMD ["args1", "args2"]: 提供给ENTRYPOINT做默认参数。
+>
+>ENTRYPOINT：指定容器的“入口”。支持两种格式，默认不会被docker run指定
+>的参数覆盖。可以知道 --entrypoint参数去覆盖。每个Dockerfile中只能有
+>一个ENTRYPOINT，当指定多个时，只有最后一个起效。
+>
+>- ENTRYPOINT["executable", "args1", "args2"]：使用exec方式执行。
+>- ENTRYPOINT command 参数1 参数2：shell方式执行。shell方式下不能
+>接受CMD的参数。
+>
+>HEALTHCHECK：Docker1.12版本后引入的判断容器运行状态是否正常。
+
+
+### 实例
+
+通过上面对指令的了解后，我们最后通过一个小小的demo来个大家展示一下怎么
+组合使用这些指令。
+
+1.新建一个index.html文件，内容
+
+    <h1>zsj</h2>
+    
+    
+2.新建Dockerfile文件
+
+    FROM nginx:1.17.9
+    
+    LABEL maintainer="zsjlovewm.com"
+    
+    ENV NGINX_VERSION 1.17.9
+    
+    USER root
+    
+    RUN apt-get -yq update && apt-get insatll -y curl &&\
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+    
+    # 设置容器内 /data目录为匿名卷
+    VOLUME ["/data"]
+    
+    # 设置工作目录
+    WORKDIR /data/html/
+    
+    # 复制index.html到/data/html目录下
+    COPY index.html .
+    
+    EXPOSE 80
+    
+    # 此处CMD作为ENTRYPOINT的参数
+    # 相当于CMD ["nginx", "-g" ,"daemon off;"]
+    CMD ["-g", "daemon off;"]
+    
+    ENTRYPOINT ["nginx"]
+    
+    # 访问Nginx80端口，来判断容器服务是否正常运行
+    HEALTHCHECK --interval=5s --timeout=3s \
+    CMD curl -fs http://localhost/ || exit 1
+    
+3.构建镜像
+
+    docker build -t n:v1 .
+
+4.运行容器
+
+    docker run --name nv1 -p 8080:80 n:v1
+    
+启动后，HEALTHCHECK就会5s访问一次Nginx服务，来确保容器运行的状态。
+
+服务正常的状态。COMMAND栏显示的命令，为ENTRYPOINT指令和CMD指令合并后的
+命令。
+
+5.进入容器，验证结果。
+
+    docker exec -it nv1 bash
+    
+- exec: 执行命令                         
+- it: 交互式tty终端                         
+- nv1: 容器启动的名字                         
+- bash: 使用的shell类型
+
+进入容器后，默认会切换到/data/html目录，这个是WORKDIR指令指定的目录。
+可以使用id命令查看当前用户信息，显示为root。这个是USER指令指定的用户。
+使用ls命令来查看当前目录的文件，会看到index.html文件，这个是COPY指令
+复制到容器的文件。使用env命令可以查看当前环境下有一个变量NGINX_VERSION
+=1.17.9这个ENV指令指定的信息。                          
         
                 
         
