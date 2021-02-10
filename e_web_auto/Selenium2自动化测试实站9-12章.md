@@ -186,7 +186,8 @@ desired_capabilities.py
             "version": "", # 浏览器版本
             "platform": "ANY", # 测试平台（ANY表示默认平台）  
             "javascriptEnabled": True, # JavaScript启动状态
-            "marionette": False, # marionette
+            "marionette": False, 
+            # marionette是python客户端允许你远程控制基于gecko的浏览器或设备运行一个marionette服务器，包括桌面Firefox和Firefox OS。Firefox特有。
         }
     ...
         CHROME = {
@@ -200,4 +201,104 @@ desired_capabilities.py
      ...
 
 
-   
+### 9.3.2 Remote实例
+
+remote_ts.py
+
+    from selenium.webdirver import Remote
+
+    driver = Remote(command_executor="http://ip:port/wd/hub",
+                    desired_capabilities={'platform': 'ANY',
+                                          'browserName': 'chrome',
+                                          'version': '',
+                                          'javascriptEnabled': True
+                                         }
+                    )
+
+    driver.get('http://www.baidu.com')
+    driver.find_element_by_id("kw").send_keys("remote")
+    driver.find_element_by_id("su").click()
+
+    driver.quit()
+
+Remote()大大增加了配置的灵活性。
+
+### 9.3.3 参数化平台及浏览器
+
+通过Selenium Server可以轻松地创建本地节点和远程节点。而Remote的作用就是配置测试用例在这些节点上执行，下面就通过例子来演示它们两者的组合。
+
+    java -jar selenium-server-standalone-x.xx.x.jar -role hub
+
+    java -jar selenium-server-standalone-x.xx.x.jar -role node -port 5555
+
+    java -jar selenium-server-standalone-x.xx.x.jar -role node -port 5556
+
+
+修改后的remote_ts.py
+
+    from selenium.webdriver import Remote
+
+    lists = {
+            "http://ip:port/wd/hub": 'chrome',
+            "http://ip:port/wd/hub": 'firefox',
+            "http://ip:port/wd/hub": 'internet explorer'
+            }
+
+    for host, browser in lists.items():
+        print(host, browser)
+        driver = Remote(command_executor=host,
+                        desired_capabilities={'platform': 'ANY',
+                                              'browserName': browser,
+                                              'version': '',
+                                              'javascriptEnabled': True
+                                             }
+                        )
+
+        driver.get("http://www.baidu.com")
+        driver.find_element_by_id("kw").send_keys(browser)
+        driver.find_element_by_id("su").click()
+        driver.close()
+
+
+首先lists字典，定义不同的主机IP、端口号及浏览器。然后，通过for循环读取lists字典中的数据作为Remote()的配置信息，从而使脚本在不同的节点及浏览器下执行。
+
+1.启动远程node
+
+- 本地hub主机与远程node主机之间可以用ping命令连通
+- 远程主机必须安装用例执行的浏览器及驱动，并且驱动要放在环境变量path的目录下。
+- 远程主机必须安装Java环境，因为需要运行Selenium Server
+
+2.操作步骤
+
+- 启动本地hub主机(ip:172.16.10.66)
+
+    - java -jar selenium-server-standalone-xxx.jar -role hub     
+
+- 启动远程node主机(ip:172.16.10.34)
+
+    - java -jar selenium-server-standalone-xxx.jar -role node -port 5555 -hub http://172.17.10.66:4444/grid/register
+
+- 修改远程主机的IP地址及端口号，在其上面的Firefox浏览下运行脚本。
+
+
+修改remote_ts.py中的lists
+
+    lists = {
+            ...
+            "http://172.16.10.34:5555/wd/hub": 'firefox'
+            "http://172.16.10.66:4444/wd/hub": '自动分配node'
+    }   
+
+
+
+#### Selenium Server
+
+- 创建.bat文件 
+
+    java -jar D:\\selenium\selenium-server-standalone-xxx.jar -role hub
+
+然后，在需要的时候双击启动。
+
+- 通过VisGrid工具来启动和管理节点
+
+### 9.4 WebDriver驱动
