@@ -302,3 +302,33 @@ Remote()大大增加了配置的灵活性。
 - 通过VisGrid工具来启动和管理节点
 
 ### 9.4 WebDriver驱动
+
+WebDriver所支持的平台/浏览器/模式
+
+- Android ：： 支持脚本在Android WebView应用的测试，一般指移动端浏览器
+
+- BlackBerry：： 支持脚本在黑莓浏览器上运行
+
+- Firefox: 包含在Selenium 安装包中：安装后直接运行Firefox浏览器
+
+- Chrome：chromedriver.exe：Chrome
+
+- IE：IEDriverServer.exe:老版本IE浏览器
+
+- Edge： MicrosoftWebDriver.exe:新版Edge
+
+- Opera: operadriver.exe:基于ChromeDriver
+
+- Safari：包含在Selenium Server中：苹果公司开发
+
+- HtmlUnit：包含在Selenium Server中HtmlUnit将请求返回文档模拟成HTML，从而模拟浏览器的运行，但又非真正地启动一款浏览器执行脚本
+
+- PhantomJS：phantomjs.exe:PhantomJS是一个拥有JavaScript API的无界面WebKit，和HtmlUnit类似，可以看做是一款无界面的浏览器
+
+
+1.支撑平台
+
+2.支持浏览器
+
+3.支持模式
+
