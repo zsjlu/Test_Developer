@@ -328,7 +328,52 @@ WebDriver所支持的平台/浏览器/模式
 
 1.支撑平台
 
+Android和BlackBerry    
+
 2.支持浏览器
+
+Firefox、Chrome、IE、Edge、Opera、Safari
 
 3.支持模式
 
+HtmlUtil和PhantomJS
+
+>关于浏览器内核
+>    浏览器最重要或者说核心的部分是“Rendering Engine”，可大概翻译为“渲染引擎”，不过我们一般习惯称其为“浏览器内核”，负责对网页语法的解释（HTML、CSS、JS）并渲染网页。
+>Trident
+>    IE内核：IE4~IE11
+>Gecko
+>    Firefox内核
+>Presto
+>    Opera前内核（已废弃）
+>Webkit（Safari内核，Chrome内核原型）
+>
+>Blink
+>    是开源引擎WebKit中WebCore组件的一个分支
+
+
+
+#### 9.4.4 HtmlUnit模式
+
+    # Java页面分析器
+
+    java -jar selenium-server-standalone-xxx.jar
+
+    from selenium.webdriver import Remote
+    from selenium.common.exceptions import WebDriverException
+
+    dc = {'browserName': 'htmlunit'}
+    driver = Remote(command_executor='http://127.0.0.1:4000/wd/hub',
+                    desired_capabilities=dc)
+    driver.get()
+
+#### 9.4.5 PhantomJS模式
+
+    # 拥有javaScript API的无界面WebKit内核，使用前需要先下载，放到python运行路径下
+
+    from selenium import webdriver
+    from time import sleep
+
+    driver = webdriver.PhantomJS()
+
+    
